@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Uitslagen</title>
+  </head>
+  <body>
+    <h1>Uitslagen</h1>
+    <div id="results"></div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+      import {
+        getFirestore,
+        getDocs,
+        collection,
+      } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAvVdZVpI0YxfP10JPrOJPtGEx_xVcsKcE",
+        authDomain: "kaasplank-d9094.firebaseapp.com",
+        projectId: "kaasplank-d9094",
+        storageBucket: "kaasplank-d9094.firebasestorage.app",
+        messagingSenderId: "928296967478",
+        appId: "1:928296967478:web:21f05cff40bdd154ff2797",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const snapshot = await getDocs(collection(db, "ratings"));
+      const data = {};
+
+      snapshot.forEach((doc) => {
+        const { cheese, score } = doc.data();
+        data[cheese] ??= [];
+        data[cheese].push(score);
+      });
+
+      const container = document.getElementById("results");
+
+      Object.entries(data).forEach(([cheese, scores]) => {
+        const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(
+          1
+        );
+
+        const p = document.createElement("p");
+        p.innerHTML = `<b>${cheese}</b>: ${avg} (${scores.length} stemmen)`;
+        container.appendChild(p);
+      });
+    </script>
+  </body>
+</html>
